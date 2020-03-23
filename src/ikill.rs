@@ -27,11 +27,12 @@ pub async fn run(all_processes: Vec<Process>) {
 
     let selected: String = selected_item.iter().map(|item| item.text()).collect();
 
-    let name_and_pid: Vec<&str> = selected.split(' ').collect();
-
-    if name_and_pid.len() < 2 {
+    // if `esc` is pressed no selection will be made, therefore this will be empty.
+    if selected.is_empty() {
         return;
     }
+
+    let name_and_pid: Vec<&str> = selected.split(' ').collect();
 
     let selected_pid = name_and_pid
         .get(1)
@@ -44,7 +45,7 @@ pub async fn run(all_processes: Vec<Process>) {
         .find(|item| item.pid() == selected_pid)
         .unwrap();
 
-    match selected_process.kill().await {
+    match selected_process.terminate().await {
         Ok(_) => {}
         Err(error) => {
             eprintln!("error: {}", error.to_string());
