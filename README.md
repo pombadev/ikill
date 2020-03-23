@@ -17,3 +17,4 @@ cargo install ikill
  - [ ] add command line interface.
  - [ ] Multiple selection.
  - [ ] Kill process by PID/name (without fuzzy finder).
+ - [ ] Preview pane with process id?
