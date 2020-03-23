@@ -1,7 +1,7 @@
 use heim::process::{processes, Process};
-use tokio::stream::StreamExt as _;
+use tokio::stream::StreamExt;
 
-mod fkill;
+mod ikill;
 
 #[tokio::main]
 async fn main() {
@@ -14,5 +14,5 @@ async fn main() {
         .collect()
         .await;
 
-    fkill::run(all_processes).await;
+    ikill::run(all_processes).await;
 }

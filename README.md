@@ -1,4 +1,4 @@
-ikill [![Crates.io](https://img.shields.io/crates/v/fkill)](https://crates.io/crates/ikill) ![License](https://img.shields.io/crates/l/ikill)
+ikill [![Crates.io](https://img.shields.io/crates/v/ikill)](https://crates.io/crates/ikill) ![License](https://img.shields.io/crates/l/ikill)
 ---
 
 > Interactively kill running processes, inspired by [fkill-cli](https://github.com/sindresorhus/fkill-cli).
