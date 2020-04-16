@@ -6,6 +6,7 @@ pub async fn run(all_processes: Vec<Process>) {
     let options = SkimOptionsBuilder::default()
         .height(Some("70%"))
         .reverse(true)
+        .multi(true)
         .build()
         .unwrap();
 
@@ -13,7 +14,13 @@ pub async fn run(all_processes: Vec<Process>) {
 
     for ps in &all_processes {
         let pid = ps.pid();
-        let name = ps.name().await.unwrap();
+        let name = match ps.name().await {
+            Ok(name) => name,
+            Err(error) => {
+                eprint!("{}", error.to_string());
+                std::process::exit(1);
+            }
+        };
 
         input.push_str(format!("{} {}\n", name, pid).as_str())
     }
@@ -21,34 +28,39 @@ pub async fn run(all_processes: Vec<Process>) {
     let item_reader = SkimItemReader::default();
     let items = item_reader.of_bufread(Cursor::new(input.to_string()));
 
-    let selected_item = Skim::run_with(&options, Some(items))
+    let selected_items = Skim::run_with(&options, Some(items))
         .map(|out| out.selected_items)
         .unwrap_or_else(Vec::new);
 
-    let selected: String = selected_item.iter().map(|item| item.text()).collect();
-
-    // if `esc` is pressed no selection will be made, therefore this will be empty.
-    if selected.is_empty() {
-        return;
-    }
-
-    let name_and_pid: Vec<&str> = selected.split(' ').collect();
-
-    let selected_pid = name_and_pid
-        .get(1)
-        .expect("Unable to get PID")
-        .parse::<i32>()
-        .unwrap();
-
-    let selected_process = all_processes
+    let selected_pids = selected_items
         .iter()
-        .find(|item| item.pid() == selected_pid)
-        .unwrap();
+        .map(|item| {
+            // returns str like: "command_name pid"
+            let text = item.text();
+            let mut pieces = text.split_ascii_whitespace();
+            // skip name
+            pieces.next();
+            // return pid <i32> which will be the pid or -1 so that we can filter it out later
+            match pieces.next() {
+                None => -1,
+                Some(pid) => match pid.parse::<i32>() {
+                    Ok(n) => n,
+                    Err(_) => -1,
+                },
+            }
+        })
+        .collect::<Vec<i32>>();
 
-    match selected_process.terminate().await {
-        Ok(_) => {}
-        Err(error) => {
-            eprintln!("error: {}", error.to_string());
+    for process in all_processes {
+        let selected_process = selected_pids.contains(&process.pid());
+
+        if selected_process {
+            match process.terminate().await {
+                Ok(_) => {}
+                Err(error) => {
+                    eprintln!("error: {}", error.to_string());
+                }
+            }
         }
     }
 }
