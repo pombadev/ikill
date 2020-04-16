@@ -3,6 +3,13 @@ ikill [![Crates.io](https://img.shields.io/crates/v/ikill)](https://crates.io/cr
 
 > Interactively kill running processes, inspired by [fkill-cli](https://github.com/sindresorhus/fkill-cli).
 
+### Features
+- List and fuzzy find running processes.
+- Multi select processes (by pressing <kbd>⭾</kbd>)
+
+### Usage
+Run `ikill` on terminal, search and press <kbd>↵</kbd>.
+
 ### Screenshot
 
 [![A screenshot](./screencast.gif)](./screencast.gif)
