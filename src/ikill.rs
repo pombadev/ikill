@@ -1,14 +1,24 @@
-use heim::process::Process;
+use heim::process::{processes, Process};
 use skim::prelude::*;
 use std::io::Cursor;
+use tokio::stream::StreamExt;
 
-pub async fn run(all_processes: Vec<Process>) {
+pub async fn run() {
     let options = SkimOptionsBuilder::default()
         .height(Some("70%"))
         .reverse(true)
         .multi(true)
         .build()
         .unwrap();
+
+    let processes = processes();
+
+    tokio::pin!(processes);
+
+    let all_processes: Vec<Process> = processes
+        .map(|item| item.expect("Unable to unwrap process"))
+        .collect()
+        .await;
 
     let mut input = String::new();
 
@@ -37,7 +47,7 @@ pub async fn run(all_processes: Vec<Process>) {
         .map(|item| {
             // returns str like: "command_name pid"
             let text = item.text();
-            let mut pieces = text.split_ascii_whitespace();
+            let mut pieces = text.split_whitespace();
             // skip name
             pieces.next();
             // return pid <i32> which will be the pid or -1 so that we can filter it out later
