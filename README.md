@@ -21,6 +21,5 @@ cargo install ikill
 ### Usage
 
 ### TODO
- - [ ] add command line interface.
  - [ ] Kill process by PID/name (without fuzzy finder).
  - [ ] Preview pane with process id?
