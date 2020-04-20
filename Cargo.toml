@@ -1,6 +1,6 @@
 [package]
 name = "ikill"
-version = "1.2.0"
+version = "1.2.1"
 authors = ["pjmp"]
 edition = "2018"
 keywords = ["cli", "process", "kill", "killall", "fkill"]
@@ -15,4 +15,3 @@ description = "Interactively kill processes"
 heim = {version = "0.1.0-alpha.1", default-features = false, features = ["process", "runtime-tokio"]}
 tokio = { version = "0.2.13", features = ["full", "macros"] }
 skim = "0.8.0"
-clap = "2.33.0"
