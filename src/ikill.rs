@@ -49,20 +49,18 @@ pub async fn run() {
             let text = item.text();
             let mut pieces = text.split_whitespace();
             // skip name
-            pieces.next();
-            // return pid <i32> which will be the pid or -1 so that we can filter it out later
+            let _name = pieces.next();
+
             match pieces.next() {
-                None => -1,
-                Some(pid) => match pid.parse::<i32>() {
-                    Ok(n) => n,
-                    Err(_) => -1,
-                },
+                Some(pid) => pid.to_string(),
+                None => "".to_string()
             }
         })
-        .collect::<Vec<i32>>();
+        .collect::<Vec<String>>();
 
     for process in all_processes {
-        let selected_process = selected_pids.contains(&process.pid());
+        // pid is i32, .to_string() will convert it to String
+        let selected_process = selected_pids.contains(&process.pid().to_string());
 
         if selected_process {
             match process.terminate().await {
