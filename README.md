@@ -18,7 +18,27 @@ Run `ikill` on terminal, search and press <kbd>↵</kbd>.
 ```
 cargo install ikill
 ```
+
 ### Usage
+```
+ikill - Interactively kill processes
+
+USAGE:
+    ikill
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+```
+
+# Alternatives
+```bash
+# using `fzf`
+pgrep . -l | fzf --reverse -m | awk '{ print $2 }' | xargs -I% -r kill -9 '%'
+
+# using `dmenu`
+pgrep . -l | dmenu -l 20 | awk '{ print $2 }' | xargs -I% -r kill -9 '%'
+```
 
 ### TODO
  - [ ] Kill process by PID/name (without fuzzy finder).

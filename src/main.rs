@@ -14,14 +14,17 @@ FLAGS:
 ";
 
 fn unknown_args(arg: String) {
-    println!("
+    println!(
+        "
 error: Found argument '{}' which wasn't expected, or isn't valid in this context
 
 USAGE:
     ikill
 
 For more information try --help
-", arg);
+",
+        arg
+    );
 }
 
 #[tokio::main]
@@ -29,7 +32,7 @@ async fn main() {
     match args().nth(1) {
         None => {
             ikill::run().await;
-        },
+        }
         Some(arg) => {
             if arg == "-h" || arg == "--help" {
                 println!("{}", USAGE);
@@ -39,6 +42,6 @@ async fn main() {
                 unknown_args(arg);
                 std::process::exit(1);
             }
-        },
+        }
     };
 }

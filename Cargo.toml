@@ -15,3 +15,8 @@ description = "Interactively kill processes"
 heim = {version = "0.1.0-alpha.1", default-features = false, features = ["process", "runtime-tokio"]}
 tokio = { version = "0.2.13", features = ["full", "macros"] }
 skim = "0.8.0"
+
+[profile.release]
+opt-level = 3
+lto = true
+panic = 'abort'

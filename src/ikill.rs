@@ -53,7 +53,7 @@ pub async fn run() {
 
             match pieces.next() {
                 Some(pid) => pid.to_string(),
-                None => "".to_string()
+                None => "".to_string(),
             }
         })
         .collect::<Vec<String>>();
