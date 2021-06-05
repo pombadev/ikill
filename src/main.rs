@@ -27,21 +27,23 @@ For more information try --help
     );
 }
 
-#[tokio::main]
-async fn main() {
-    match args().nth(1) {
-        None => {
-            ikill::run().await;
-        }
-        Some(arg) => {
-            if arg == "-h" || arg == "--help" {
-                println!("{}", USAGE);
-            } else if arg == "-V" || arg == "--version" {
-                println!("ikill v1.2.1");
-            } else {
-                unknown_args(arg);
-                std::process::exit(1);
+fn main() {
+    smol::block_on(async {
+        match args().nth(1) {
+            None => {
+                ikill::run().await;
+            }
+            Some(arg) => {
+                if arg == "-h" || arg == "--help" {
+                    println!("{}", USAGE);
+                } else if arg == "-V" || arg == "--version" {
+                    use std::env;
+                    println!("{} v{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
+                } else {
+                    unknown_args(arg);
+                    std::process::exit(1);
+                }
             }
         }
-    };
+    });
 }

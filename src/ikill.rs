@@ -1,7 +1,7 @@
-use heim::process::{processes, Process};
+use heim::process::processes;
 use skim::prelude::*;
+use smol::stream::StreamExt;
 use std::io::Cursor;
-use tokio::stream::StreamExt;
 
 pub async fn run() {
     let options = SkimOptionsBuilder::default()
@@ -11,50 +11,35 @@ pub async fn run() {
         .build()
         .unwrap();
 
-    let processes = processes();
-
-    tokio::pin!(processes);
-
-    let all_processes: Vec<Process> = processes
-        .map(|item| item.expect("Unable to unwrap process"))
-        .collect()
-        .await;
+    let all_processes = match processes().await {
+        Ok(processes) => processes.filter_map(|process| process.ok()).collect().await,
+        Err(_) => Vec::with_capacity(0),
+    };
 
     let mut input = String::new();
 
     for ps in &all_processes {
-        let pid = ps.pid();
-        let name = match ps.name().await {
-            Ok(name) => name,
-            Err(error) => {
-                eprint!("{}", error.to_string());
-                std::process::exit(1);
-            }
-        };
-
-        input.push_str(format!("{} {}\n", name, pid).as_str())
+        if let Ok(name) = ps.name().await {
+            input.push_str(format!("{} {}\n", name, ps.pid()).as_str());
+        }
     }
 
     let item_reader = SkimItemReader::default();
-    let items = item_reader.of_bufread(Cursor::new(input.to_string()));
+    let items = item_reader.of_bufread(Cursor::new(input));
 
     let selected_items = Skim::run_with(&options, Some(items))
+        // skip items where `esc` key were pressed
+        .filter(|out| !out.is_abort)
         .map(|out| out.selected_items)
         .unwrap_or_else(Vec::new);
 
     let selected_pids = selected_items
         .iter()
         .map(|item| {
-            // returns str like: "command_name pid"
-            let text = item.text();
-            let mut pieces = text.split_whitespace();
-            // skip name
-            let _name = pieces.next();
-
-            match pieces.next() {
-                Some(pid) => pid.to_string(),
-                None => "".to_string(),
-            }
+            item.text()
+                .split_whitespace()
+                .skip(1)
+                .fold(String::with_capacity(0), |_, curr| curr.into())
         })
         .collect::<Vec<String>>();
 
@@ -66,7 +51,7 @@ pub async fn run() {
             match process.terminate().await {
                 Ok(_) => {}
                 Err(error) => {
-                    eprintln!("error: {}", error.to_string());
+                    eprintln!("Error: {}", error.to_string());
                 }
             }
         }

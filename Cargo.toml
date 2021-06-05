@@ -1,6 +1,6 @@
 [package]
 name = "ikill"
-version = "1.2.1"
+version = "1.3.0"
 authors = ["pjmp"]
 edition = "2018"
 keywords = ["cli", "process", "kill", "killall", "fkill"]
@@ -12,9 +12,9 @@ repository = "https://github.com/pjmp/ikill"
 description = "Interactively kill processes"
 
 [dependencies]
-heim = {version = "0.1.0-alpha.1", default-features = false, features = ["process", "runtime-tokio"]}
-tokio = { version = "0.2.13", features = ["full", "macros"] }
-skim = "0.8.0"
+heim = {version = "0.1.0-rc.1", default-features = false, features = ["process"]}
+smol = "1.2.5"
+skim = "0.9.4"
 
 [profile.release]
 opt-level = 3
