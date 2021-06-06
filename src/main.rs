@@ -14,7 +14,7 @@ FLAGS:
 ";
 
 fn unknown_args(arg: String) {
-    println!(
+    eprintln!(
         "
 error: Found argument '{}' which wasn't expected
 

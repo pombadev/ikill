@@ -16,13 +16,15 @@ pub async fn run() {
         Err(_) => Vec::with_capacity(0),
     };
 
-    let mut input = String::new();
+    let input = all_processes.iter().fold(String::new(), |mut acc, ps| {
+        smol::block_on(async {
+            if let Ok(name) = ps.name().await {
+                acc.push_str(format!("{} {}\n", name, ps.pid()).as_str());
+            }
+        });
 
-    for ps in &all_processes {
-        if let Ok(name) = ps.name().await {
-            input.push_str(format!("{} {}\n", name, ps.pid()).as_str());
-        }
-    }
+        acc
+    });
 
     let item_reader = SkimItemReader::default();
     let items = item_reader.of_bufread(Cursor::new(input));
