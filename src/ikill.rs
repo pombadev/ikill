@@ -46,15 +46,11 @@ pub async fn run() {
         .collect::<Vec<String>>();
 
     for process in all_processes {
-        // pid is i32, .to_string() will convert it to String
         let selected_process = selected_pids.contains(&process.pid().to_string());
 
         if selected_process {
-            match process.terminate().await {
-                Ok(_) => {}
-                Err(error) => {
-                    eprintln!("Error: {}", error.to_string());
-                }
+            if let Err(error) = process.terminate().await {
+                eprintln!("Error: {}", error.to_string());
             }
         }
     }
