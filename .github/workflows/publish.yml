@@ -20,16 +20,16 @@ jobs:
         include:
           - name: linux
             os: ubuntu-latest
-            artifact_name: sunny
-            asset_name: sunny-linux-amd64
+            artifact_name: ikill
+            asset_name: ikill-linux-amd64
           - name: windows
             os: windows-latest
-            artifact_name: sunny.exe
-            asset_name: sunny-windows-amd64
+            artifact_name: ikill.exe
+            asset_name: ikill-windows-amd64
           - name: macos
             os: macos-latest
-            artifact_name: sunny
-            asset_name: sunny-macos-amd64
+            artifact_name: ikill
+            asset_name: ikill-macos-amd64
 
     steps:
     - uses: actions/checkout@v1
