@@ -20,7 +20,7 @@ If you have rust toolchain installed, you can just do:
 cargo install ikill
 ```
 
-Alternatively, you can download pre-build binaries from the [release page](https://github.com/pjmp/sunny/releases).
+Alternatively, you can download pre-build binaries from the [release page](https://github.com/pjmp/ikill/releases).
 
 ### Usage
 ```
