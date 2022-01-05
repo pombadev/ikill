@@ -15,9 +15,12 @@ Run `ikill` on terminal, search and press <kbd>↵</kbd>.
 [![A screenshot](./screencast.gif)](./screencast.gif)
 
 ### Installation
+If you have rust toolchain installed, you can just do:
 ```
 cargo install ikill
 ```
+
+Alternatively, you can download pre-build binaries from the [release page](https://github.com/pjmp/sunny/releases).
 
 ### Usage
 ```
