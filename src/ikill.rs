@@ -35,18 +35,17 @@ pub async fn run() {
         .map(|out| out.selected_items)
         .unwrap_or_else(Vec::new);
 
-    let selected_pids = selected_items
+    let mut selected_pids = selected_items
         .iter()
         .map(|item| {
             item.text()
                 .split_whitespace()
                 .skip(1)
                 .fold(String::with_capacity(0), |_, curr| curr.into())
-        })
-        .collect::<Vec<String>>();
+        });
 
     for process in all_processes {
-        let selected_process = selected_pids.contains(&process.pid().to_string());
+        let selected_process = selected_pids.any(|x| x == process.pid().to_string());
 
         if selected_process {
             if let Err(error) = process.terminate().await {
