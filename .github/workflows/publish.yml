@@ -3,7 +3,7 @@ name: Publish
 on:
   push:
     tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - "v[0-9]+.[0-9]+.[0-9]+"
 
 jobs:
   publish:
@@ -11,41 +11,40 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        name: [
-            windows,
-            macos,
-            linux
-        ]
+        name: [macos, linux]
 
         include:
           - name: linux
             os: ubuntu-latest
             artifact_name: ikill
             asset_name: ikill-linux-amd64
-          - name: windows
-            os: windows-latest
-            artifact_name: ikill.exe
-            asset_name: ikill-windows-amd64
           - name: macos
             os: macos-latest
             artifact_name: ikill
             asset_name: ikill-macos-amd64
+    outputs:
+      app_version: ${{ env.APP_VERSION }}
 
     steps:
-    - uses: actions/checkout@v1
+      - uses: actions/checkout@v1
 
-    - uses: actions-rs/toolchain@v1
-      with:
-        profile: minimal
-        toolchain: stable
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
 
-    - name: Build
-      run: cargo build --release --locked
+      - name: Get the release version from the tag
+        shell: bash
+        if: env.APP_VERSION == ''
+        run: |
+          echo "APP_VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+      - name: Build
+        run: cargo build --release --locked
 
-    - name: Upload binaries to release
-      uses: svenstaro/upload-release-action@v1-release
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: target/release/${{ matrix.artifact_name }}
-        asset_name: ${{ matrix.asset_name }}
-        tag: ${{ github.ref }}
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/release/${{ matrix.artifact_name }}
+          asset_name: ${{ matrix.asset_name }}_${{ env.APP_VERSION }}
+          tag: ${{ github.ref }}
