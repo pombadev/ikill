@@ -1,56 +1,77 @@
 use heim::process::processes;
 use skim::prelude::*;
 use smol::stream::StreamExt;
-use std::io::Cursor;
 
-pub async fn run() {
-    let options = SkimOptionsBuilder::default()
+struct SelectedProcess {
+    name: String,
+    pid: i32,
+    cmd: String,
+}
+
+impl SkimItem for SelectedProcess {
+    fn text(&self) -> Cow<str> {
+        let inner = format!("{} {} {}", self.pid, self.name, self.cmd);
+
+        Cow::Owned(inner)
+    }
+
+    fn output(&self) -> Cow<str> {
+        Cow::Owned(self.pid.to_string())
+    }
+}
+
+pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    let skim_options = SkimOptionsBuilder::default()
         .height(Some("70%"))
         .reverse(true)
         .multi(true)
-        .build()
-        .unwrap();
+        .case(CaseMatching::Smart)
+        .header(Some("PID NAME COMMAND"))
+        .build()?;
 
-    let all_processes = match processes().await {
-        Ok(processes) => processes.filter_map(|process| process.ok()).collect().await,
-        Err(_) => Vec::with_capacity(0),
-    };
+    let all_processes = processes()
+        .await?
+        .filter_map(|process| process.ok())
+        .collect::<Vec<_>>()
+        .await;
 
-    let input = all_processes.iter().fold(String::new(), |mut acc, ps| {
-        smol::block_on(async {
-            if let Ok(name) = ps.name().await {
-                acc.push_str(format!("{} {}\n", name, ps.pid()).as_str());
-            }
-        });
+    let (tx, rx): (SkimItemSender, SkimItemReceiver) = unbounded();
 
-        acc
-    });
+    for ps in &all_processes {
+        let name = ps.name().await?;
+        let pid = ps.pid();
+        let cmd = ps.command().await?;
+        let cmd = cmd.to_os_string();
+        let cmd = cmd.to_string_lossy();
 
-    let item_reader = SkimItemReader::default();
-    let items = item_reader.of_bufread(Cursor::new(input));
+        tx.send(Arc::new(SelectedProcess {
+            name,
+            pid,
+            cmd: cmd.into_owned(),
+        }))?;
+    }
 
-    let selected_items = Skim::run_with(&options, Some(items))
+    drop(tx);
+
+    let selected_items = Skim::run_with(&skim_options, Some(rx))
         // skip items where `esc` key were pressed
         .filter(|out| !out.is_abort)
         .map(|out| out.selected_items)
         .unwrap_or_else(Vec::new);
 
-    let mut selected_pids = selected_items
+    #[allow(clippy::needless_collect)]
+    let selected_items = selected_items
         .iter()
-        .map(|item| {
-            item.text()
-                .split_whitespace()
-                .skip(1)
-                .fold(String::with_capacity(0), |_, curr| curr.into())
-        });
+        .map(|item| item.output().to_string())
+        .collect::<Vec<_>>();
 
     for process in all_processes {
-        let selected_process = selected_pids.any(|x| x == process.pid().to_string());
+        let selected_process = selected_items.contains(&process.pid().to_string());
 
         if selected_process {
-            if let Err(error) = process.terminate().await {
-                eprintln!("Error: {}", error.to_string());
-            }
+            process.kill().await?;
         }
     }
+
+    Ok(())
 }
