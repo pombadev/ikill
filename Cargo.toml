@@ -1,22 +1,22 @@
 [package]
-name = "ikill"
-version = "1.4.0"
 authors = ["pjmp"]
-edition = "2021"
-keywords = ["cli", "process", "kill", "killall", "fkill"]
 categories = ["command-line-utilities"]
-readme = "README.md"
-license = "MIT"
-homepage = "https://github.com/pjmp/ikill"
-repository = "https://github.com/pjmp/ikill"
 description = "Interactively kill processes"
+edition = "2021"
+homepage = "https://github.com/pjmp/ikill"
+keywords = ["cli", "process", "kill", "killall", "fkill"]
+license = "MIT"
+name = "ikill"
+readme = "README.md"
+repository = "https://github.com/pjmp/ikill"
+version = "1.5.0"
 
 [dependencies]
 heim = {version = "0.1.0-rc.1", default-features = false, features = ["process"]}
-smol = "1.2.5"
 skim = "0.9.4"
+smol = "1.2.5"
 
 [profile.release]
-opt-level = 3
 lto = true
+opt-level = 3
 panic = 'abort'

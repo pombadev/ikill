@@ -31,7 +31,9 @@ fn main() {
     smol::block_on(async {
         match env::args().nth(1) {
             None => {
-                ikill::run().await;
+                if let Err(error) = ikill::run().await {
+                    eprintln!("Error: {}", error);
+                }
             }
             Some(arg) => {
                 match arg.as_str() {
