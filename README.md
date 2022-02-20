@@ -4,10 +4,13 @@ ikill [![Crates.io](https://img.shields.io/crates/v/ikill)](https://crates.io/cr
 > Interactively kill running processes, inspired by [fkill-cli](https://github.com/sindresorhus/fkill-cli).
 
 ### Features
+
 - List and fuzzy find running processes.
-- Multi select processes (by pressing <kbd>⭾</kbd>)
+- Multi select processes by pressing <kbd>⭾</kbd>.
+- Clear all queries by pressing <kbd>Ctrl</kbd>+<kbd>l</kbd>.
 
 ### Usage
+
 Run `ikill` on terminal, search and press <kbd>↵</kbd>.
 
 ### Screenshot
@@ -15,6 +18,7 @@ Run `ikill` on terminal, search and press <kbd>↵</kbd>.
 [![A screenshot](./screencast.gif)](./screencast.gif)
 
 ### Installation
+
 If you have rust toolchain installed, you can just do:
 ```
 cargo install ikill
@@ -23,6 +27,7 @@ cargo install ikill
 Alternatively, you can download pre-build binaries from the [release page](https://github.com/pjmp/ikill/releases).
 
 ### Usage
+
 ```
 ikill - Interactively kill processes
 
@@ -35,6 +40,7 @@ FLAGS:
 ```
 
 # Alternatives
+
 ```bash
 # using `fzf`
 pgrep . -l | fzf --reverse -m | awk '{ print $2 }' | xargs -I% -r kill -9 '%'
@@ -44,5 +50,6 @@ pgrep . -l | dmenu -l 20 | awk '{ print $2 }' | xargs -I% -r kill -9 '%'
 ```
 
 ### TODO
- - [ ] Kill process by PID/name (without fuzzy finder).
+
  - [ ] Preview pane with process id?
+ - [ ] allow users to customize `skim`?

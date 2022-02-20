@@ -27,6 +27,7 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
         .multi(true)
         .case(CaseMatching::Smart)
         .header(Some("PID NAME COMMAND"))
+        .bind(vec!["ctrl-l:unix-line-discard"])
         .build()?;
 
     let all_processes = processes()
@@ -53,23 +54,22 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
 
     drop(tx);
 
-    let selected_items = Skim::run_with(&skim_options, Some(rx))
-        // skip items where `esc` key were pressed
-        .filter(|out| !out.is_abort)
-        .map(|out| out.selected_items)
-        .unwrap_or_else(Vec::new);
+    if let Some(out) = Skim::run_with(&skim_options, Some(rx)) {
+        // exit when `esc` key were pressed
+        if out.is_abort {
+            return Ok(());
+        }
 
-    #[allow(clippy::needless_collect)]
-    let selected_items = selected_items
-        .iter()
-        .map(|item| item.output().to_string())
-        .collect::<Vec<_>>();
+        for item in out.selected_items {
+            let pid = item.output();
 
-    for process in all_processes {
-        let selected_process = selected_items.contains(&process.pid().to_string());
+            let selected = all_processes.iter().find(|ps|
+                    // unwraping this because this was converted from i32
+                    ps.pid() == pid.parse::<i32>().unwrap());
 
-        if selected_process {
-            process.kill().await?;
+            if let Some(selected) = selected {
+                selected.kill().await?;
+            }
         }
     }
 
