@@ -1,5 +1,7 @@
 use std::{env, process};
 
+use futures_lite::future;
+
 mod ikill;
 
 const USAGE: &str = "
@@ -28,7 +30,7 @@ For more information try --help
 }
 
 fn main() {
-    smol::block_on(async {
+    future::block_on(async {
         match env::args().nth(1) {
             None => {
                 if let Err(error) = ikill::run().await {

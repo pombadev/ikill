@@ -12,9 +12,9 @@ repository = "https://github.com/pjmp/ikill"
 version = "1.5.0"
 
 [dependencies]
+futures-lite = "1.12.0"
 heim = {version = "0.1.0-rc.1", default-features = false, features = ["process"]}
 skim = "0.9.4"
-smol = "1.2.5"
 
 [profile.release]
 lto = true

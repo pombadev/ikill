@@ -1,6 +1,6 @@
+use futures_lite::StreamExt;
 use heim::process::processes;
 use skim::prelude::*;
-use smol::stream::StreamExt;
 
 struct SelectedProcess {
     name: String,
