@@ -2,6 +2,14 @@ use futures_lite::StreamExt;
 use heim::process::processes;
 use skim::prelude::*;
 
+/*
+(date; ps -ef) |
+  fzf --bind='ctrl-r:reload(date; ps -ef)' \
+      --header=$'Press CTRL-R to reload\n\n' --header-lines=2 \
+      --preview='echo {}' --preview-window=down,3,wrap \
+      --layout=reverse --height=80% | awk '{print $2}' | xargs kill -9
+*/
+
 struct SelectedProcess {
     name: String,
     pid: i32,
@@ -27,6 +35,8 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
         .multi(true)
         .case(CaseMatching::Smart)
         .header(Some("PID NAME COMMAND"))
+        .inline_info(true)
+        .preview_window(Some("right:50%"))
         .bind(vec!["ctrl-l:unix-line-discard"])
         .build()?;
 
