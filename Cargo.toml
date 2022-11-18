@@ -3,20 +3,21 @@ authors = ["pjmp"]
 categories = ["command-line-utilities"]
 description = "Interactively kill processes"
 edition = "2021"
-homepage = "https://github.com/pjmp/ikill"
+homepage = "https://github.com/pombadev/ikill"
 keywords = ["cli", "process", "kill", "killall", "fkill"]
 license = "MIT"
 name = "ikill"
 readme = "README.md"
-repository = "https://github.com/pjmp/ikill"
-version = "1.5.0"
+repository = "https://github.com/pombadev/ikill"
+version = "1.6.0"
 
 [dependencies]
 futures-lite = "1.12.0"
-heim = {version = "0.1.0-rc.1", default-features = false, features = ["process"]}
-skim = "0.9.4"
+heim = {version = "0.1.0-beta.3", default-features = false, features = ["process"]}
+skim = {version = "0.10.2", default-features = false}
 
 [profile.release]
 lto = true
 opt-level = 3
 panic = 'abort'
+strip = true
